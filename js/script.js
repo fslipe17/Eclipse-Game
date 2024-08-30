@@ -21,6 +21,18 @@ var particles = [];
 
 var intervalID = '';
 
+var gameOverModal = $('#gameOverModal');
+
+var gameOverScore = $('#gameOverScore');
+
+var btnNewGame = $('#btnNewGame');
+
+var animationId;
+
+var startModal = $('#startModal');
+
+var startContainer = $('#startContainer');
+
 function spawEnemies(){
     intervalID = setInterval(() => {
         var radius = Math.floor(Math.random() * 26) + 5;
@@ -63,9 +75,19 @@ canvas.addEventListener('click', (e) => {
     console.log(projetil.length);
 })
 
+startContainer.addEventListener('click', () => {
+    startModal.style.opacity = 0;
+    setTimeout(() => {
+        startModal.style.zIndex = -1;
+    },500)
+    startModal.style.zIndex = -1;
+    newGame();
+})
+
+btnNewGame.addEventListener('click', newGame)
 
 function loop(){
-    requestAnimationFrame(loop, canvas);
+    animationId = requestAnimationFrame(loop, canvas);
     update();
 }
 
@@ -86,9 +108,31 @@ function checkEnemies(){
         var distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
 
         if(distance < player.radius + enemy.radius){
-            alert('Game Over');
+            gameOver();
         }
     })
+}
+
+function gameOver(){
+    cancelAnimationFrame(animationId);
+    clearInterval(intervalID);
+    gameOverScore.innerText = score;
+    gameOverModal.style.opacity = 1;
+    gameOverModal.style.zIndex = 1;
+}
+
+function newGame(){
+    gameOverModal.style.opacity = 0;
+    gameOverModal.style.zIndex = -1;
+    projetil = [];
+    particles = [];
+    enemies = [];
+    score = 0;
+    txtscore.innerText = 'Score: ' + score;
+    loop();
+    spawEnemies();
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height)
 }
 
 function checkProjectiles(){
@@ -161,6 +205,3 @@ function checkParticles(){
         }
     } 
 }
-
-loop();
-spawEnemies();
